@@ -1,0 +1,30 @@
+# ===== 凭证与密钥(永不上传)=====
+cookies*.json
+cj*.txt
+cookies.txt
+.secret_key
+.env
+*.session
+*.pem
+
+# ===== 运行时产物 =====
+instance/
+*.log
+*.db
+*.sqlite3
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# ===== 打包与构建 =====
+build/
+dist/
+*.spec
+
+# ===== 工具与编辑器 =====
+.claude/
+.idea/
+.vscode/
