@@ -104,8 +104,8 @@ rslsync-lite-panel/
 
 | | |
 |---|---|
-| ![面板截图 1](docs/screenshots/1.png) | ![面板截图 2](docs/screenshots/2.png) |
-| ![面板截图 3](docs/screenshots/3.png) | ![面板截图 4](docs/screenshots/4.png) |
+| ![仪表盘](docs/screenshots/1.png) | ![调度](docs/screenshots/2.png) |
+| ![调度历史](docs/screenshots/3.png) | ![守护](docs/screenshots/4.png) |
 
 ## License
 
