@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}调度 - Resilio 面板{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">调度判定</h4>
+  <div class="d-flex align-items-center gap-3">
+    <div class="text-muted small">
+      <span class="me-2">分级：<span class="badge bg-danger">D 下载需求</span> <span class="badge bg-warning text-dark">C 上传需求</span> <span class="badge bg-success">B 做种充足</span> <span class="badge bg-secondary">A 无需求</span></span>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('sched_history') }}">调度历史</a>
+    <div class="text-muted small">
+      <span id="last-update">--:--:--</span>
+      <span id="conn-state" class="ms-2"></span>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 table-fixed">
+      <colgroup>
+        <col style="width:18%"><col style="width:8%"><col style="width:9%"><col style="width:12%">
+        <col style="width:10%"><col style="width:12%"><col style="width:10%"><col style="width:21%">
+      </colgroup>
+      <thead class="table-light">
+        <tr>
+          <th>文件夹</th><th>分级</th><th>分数</th><th>需上传对端</th><th>做种对端</th>
+          <th>待下载对端</th><th>当前状态</th><th>判定</th>
+        </tr>
+      </thead>
+      <tbody id="sched-body">
+        <tr><td colspan="8" class="text-center text-muted py-4">加载中…</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.PAGE = 'sched';</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>startPolling('/api/status');</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}登录 - Resilio 面板{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="card-title mb-1">Resilio Sync 登录</h4>
+        <p class="text-muted small mb-3">连接远端 Resilio Sync 服务器（凭据仅保存在本地浏览器会话中）</p>
+        {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">服务器地址</label>
+            <input class="form-control" name="base_url" placeholder="http://192.168.x.x:8888"
+                   value="{{ base_url or '' }}" autocomplete="url">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input class="form-control" name="username" value="{{ username or '' }}" autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密码</label>
+            <input class="form-control" type="password" name="password" autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary w-100">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

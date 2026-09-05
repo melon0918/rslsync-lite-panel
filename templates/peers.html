@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}节点 - Resilio 面板{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">节点列表</h4>
+  <div class="text-muted small">
+    <span id="last-update">--:--:--</span>
+    <span id="conn-state" class="ms-2"></span>
+  </div>
+</div>
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 table-fixed">
+      <colgroup>
+        <col style="width:16%"><col style="width:22%"><col style="width:8%">
+        <col style="width:10%"><col style="width:10%"><col style="width:34%">
+      </colgroup>
+      <thead class="table-light">
+        <tr>
+          <th>节点</th><th>ID</th><th>状态</th><th>↓速度</th><th>↑速度</th><th>所属文件夹</th>
+        </tr>
+      </thead>
+      <tbody id="peers-body">
+        <tr><td colspan="6" class="text-center text-muted py-4">加载中…</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.PAGE = 'peers';</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>startPolling('/api/peers');</script>
+{% endblock %}

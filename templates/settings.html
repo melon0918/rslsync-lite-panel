@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}设置 - Resilio 面板{% endblock %}
+{% block content %}
+<h4 class="mb-3">设置</h4>
+<div class="row g-3">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="card-title mb-3">速度限制</h6>
+        <form id="settings-form">
+          <div class="mb-3">
+            <label class="form-label">下载速度限制（KB/s，0=不限速）</label>
+            <input class="form-control" type="number" min="0" id="dlrate">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">上传速度限制（KB/s，0=不限速）</label>
+            <input class="form-control" type="number" min="0" id="ulrate">
+          </div>
+          <button type="button" class="btn btn-primary" id="save-limits">保存</button>
+          <span id="settings-msg" class="ms-2 small"></span>
+        </form>
+        <hr>
+        <div class="text-muted small" id="settings-info">加载中…</div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="card-title mb-3">批量操作</h6>
+        <button class="btn btn-warning btn-sm" id="btn-pause-all">暂停所有</button>
+        <button class="btn btn-success btn-sm" id="btn-resume-all">恢复所有</button>
+        <span id="batch-msg" class="ms-2 small"></span>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="card-title mb-3">面板刷新频率</h6>
+        <div class="d-flex align-items-center gap-2">
+          <select class="form-select form-select-sm" style="max-width:160px" id="poll-interval">
+            <option value="3000">3 秒</option>
+            <option value="5000">5 秒</option>
+            <option value="10000">10 秒</option>
+            <option value="15000">15 秒</option>
+            <option value="30000">30 秒</option>
+          </select>
+          <span id="interval-msg" class="small"></span>
+        </div>
+        <div class="text-muted small mt-2">仪表盘与节点页的自动刷新间隔（默认 5 秒）。数值越小刷新越快，但对远端服务器的请求也越多。</div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="card-title mb-3">守护接口（sync-guard）</h6>
+        <div class="mb-2">
+          <label class="form-label small text-muted">接口地址</label>
+          <input class="form-control form-control-sm" id="guard-url" placeholder="http://<server-ip>:8890">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small text-muted">访问令牌（Bearer token）</label>
+          <input class="form-control form-control-sm" type="password" id="guard-token" placeholder="RSL_API_TOKEN">
+        </div>
+        <button class="btn btn-outline-primary btn-sm" id="guard-save">保存</button>
+        <span id="guard-msg" class="ms-2 small"></span>
+        <div class="text-muted small mt-2">填写后可在「守护」页查看 OOM 重启/备份/健康状态并调整调度器。令牌仅存于本地浏览器会话。</div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="card-title mb-3">导入 / 导出</h6>
+        <a class="btn btn-outline-secondary btn-sm mb-3" href="/api/export">导出 CSV</a>
+        <form id="import-form">
+          <div class="mb-2">
+            <label class="form-label small text-muted">密钥类型</label>
+            <select class="form-select form-select-sm" name="key_type">
+              <option value="secret">读写密钥 (secret)</option>
+              <option value="readonlysecret">只读密钥 (readonlysecret)</option>
+              <option value="encryptedsecret">加密密钥 (encryptedsecret)</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <input class="form-control form-control-sm" type="file" name="file" accept=".csv">
+          </div>
+          <button class="btn btn-outline-primary btn-sm">导入</button>
+          <span id="import-msg" class="ms-2 small"></span>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.PAGE = 'settings';</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>loadSettings();</script>
+{% endblock %}

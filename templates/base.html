@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Resilio 管理面板{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card-title { font-weight: 600; }
+    .progress { background-color: #e9ecef; }
+    body { background-color: #f5f6f8; }
+    th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+    th.sortable:hover { background-color: #e9ecef; }
+    .sort-ind { font-size: 0.7em; color: #0d6efd; margin-left: 2px; }
+    .table-fixed { table-layout: fixed; }
+    .ctx-menu {
+      position: fixed; z-index: 3000; min-width: 150px;
+      background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15); padding: 4px 0;
+    }
+    .ctx-menu .ctx-item {
+      display: block; width: 100%; text-align: left; background: none;
+      border: none; padding: 7px 14px; font-size: 14px; color: #212529;
+    }
+    .ctx-menu .ctx-item:hover { background: #f1f3f5; }
+    .ctx-menu .ctx-item.danger { color: #dc3545; }
+    .ctx-menu .ctx-item.danger:hover { background: #f8d7da; }
+  </style>
+</head>
+<body>
+  {% if session.get('base_url') %}
+  <nav class="navbar navbar-expand navbar-dark bg-dark">
+    <div class="container">
+      <span class="navbar-brand">Resilio 面板</span>
+      <div class="navbar-nav">
+        <a class="nav-link {% if request.path.startswith('/dashboard') %}active{% endif %}" href="{{ url_for('dashboard') }}">仪表盘</a>
+        <a class="nav-link {% if request.path.startswith('/sched') %}active{% endif %}" href="{{ url_for('sched') }}">调度</a>
+        <a class="nav-link {% if request.path.startswith('/sched/history') %}active{% endif %}" href="{{ url_for('sched_history') }}">调度历史</a>
+        <a class="nav-link {% if request.path.startswith('/guard') %}active{% endif %}" href="{{ url_for('guard') }}">守护</a>
+        <a class="nav-link {% if request.path.startswith('/peers') %}active{% endif %}" href="{{ url_for('peers') }}">节点</a>
+        <a class="nav-link {% if request.path.startswith('/settings') %}active{% endif %}" href="{{ url_for('settings_page') }}">设置</a>
+      </div>
+      <span class="navbar-text small text-muted">{{ session.get('base_url', '') }}</span>
+      <a class="btn btn-sm btn-outline-light ms-3" href="{{ url_for('logout') }}">退出</a>
+    </div>
+  </nav>
+  {% endif %}
+  <div class="container py-4">
+    {% block content %}{% endblock %}
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

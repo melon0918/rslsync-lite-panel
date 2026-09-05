@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}仪表盘 - Resilio 面板{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">同步状态</h4>
+  <div class="d-flex align-items-center gap-3">
+    <button class="btn btn-primary btn-sm" id="btn-add-folder">添加文件夹</button>
+    <div class="text-muted small">
+      <span id="last-update">--:--:--</span>
+      <span id="conn-state" class="ms-2"></span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">文件夹</div>
+      <div class="fs-4 fw-bold" id="stat-count">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">同步中</div>
+      <div class="fs-4 fw-bold text-warning" id="stat-syncing">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">已暂停</div>
+      <div class="fs-4 fw-bold text-secondary" id="stat-paused">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">断开连接</div>
+      <div class="fs-4 fw-bold text-dark" id="stat-disconnected">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">下载速度</div>
+      <div class="fs-4 fw-bold text-success text-nowrap" id="stat-dl">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">上传速度</div>
+      <div class="fs-4 fw-bold text-primary text-nowrap" id="stat-ul">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">CPU 负载</div>
+      <div class="fs-4 fw-bold text-nowrap" id="stat-cpu">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">磁盘 IO</div>
+      <div class="fs-4 fw-bold text-nowrap" id="stat-disk">-</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm"><div class="card-body py-2">
+      <div class="text-muted small">内存占用</div>
+      <div class="fs-4 fw-bold text-nowrap" id="stat-mem">-</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-3 d-none" id="guard-reconnect-card">
+  <div class="card-header py-2 d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">定期重连</span>
+    <span class="badge" id="rc-badge">-</span>
+  </div>
+  <div class="card-body py-2">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="progress flex-grow-1" style="height:8px" role="progressbar" aria-label="定期重连进度">
+        <div class="progress-bar" id="rc-progress" style="width:0%"></div>
+      </div>
+      <span class="small text-nowrap" id="rc-count">-</span>
+    </div>
+    <div class="d-flex flex-wrap gap-3 small text-muted">
+      <span>下次尝试 <b class="text-dark" id="rc-next">-</b></span>
+      <span>最近重连 <b class="text-dark" id="rc-last">-</b></span>
+      <span>IO 均值 <b class="text-dark" id="rc-io">-</b></span>
+      <span>重连间隔 <b class="text-dark" id="rc-interval">-</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-3 d-none" id="batch-bar">
+  <div class="card-body py-2 d-flex align-items-center gap-2 flex-wrap">
+    <span class="fw-semibold" id="batch-count">已选 0 个文件夹</span>
+    <button class="btn btn-sm btn-warning" id="batch-pause">暂停</button>
+    <button class="btn btn-sm btn-success" id="batch-resume">恢复</button>
+    <button class="btn btn-sm btn-outline-danger" id="batch-disconnect">断开连接</button>
+    <button class="btn btn-sm btn-link ms-auto" id="batch-clear">取消选择</button>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 table-fixed">
+      <colgroup>
+        <col style="width:3%"><col style="width:15%"><col style="width:22%"><col style="width:11%">
+        <col style="width:13%"><col style="width:8%"><col style="width:8%">
+        <col style="width:6%"><col style="width:8%"><col style="width:6%">
+      </colgroup>
+      <thead class="table-light">
+        <tr>
+          <th class="text-center"><input type="checkbox" id="sel-all" title="全选" aria-label="全选"></th>
+          <th data-sort="name" class="sortable">名称<span class="sort-ind"></span></th>
+          <th data-sort="path" class="sortable">路径<span class="sort-ind"></span></th>
+          <th data-sort="status" class="sortable">状态<span class="sort-ind"></span></th>
+          <th data-sort="progress" class="sortable">进度<span class="sort-ind"></span></th>
+          <th data-sort="download_speed" class="sortable">↓速度<span class="sort-ind"></span></th>
+          <th data-sort="upload_speed" class="sortable">↑速度<span class="sort-ind"></span></th>
+          <th data-sort="peers_connected" class="sortable">节点<span class="sort-ind"></span></th>
+          <th data-sort="size" class="sortable">大小<span class="sort-ind"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="folder-body">
+        <tr><td colspan="10" class="text-center text-muted py-4">加载中…</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="peersModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="peersModalTitle">节点</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body" id="peersModalBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3 d-none" id="session-stats" style="z-index:1000">
+  <div class="card shadow-sm" style="min-width:250px">
+    <div class="card-body py-2 px-3">
+      <div class="fw-semibold text-muted small mb-1">会话统计</div>
+      <div class="d-flex justify-content-between text-muted small">
+        <span>最大速度</span>
+        <span class="text-nowrap ms-3">↓ <span class="text-success" id="ss-max-down">-</span> ↑ <span class="text-primary" id="ss-max-up">-</span></span>
+      </div>
+      <div class="d-flex justify-content-between text-muted small">
+        <span>已转送（本会话）</span>
+        <span class="text-nowrap ms-3" id="ss-trans">-</span>
+      </div>
+      <div class="d-flex justify-content-between text-muted small">
+        <span>终生已转送</span>
+        <span class="text-nowrap ms-3" id="ss-total">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:120px"></div>
+
+<div class="modal fade" id="addFolderModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">添加文件夹 / 导入密钥</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">密钥（secret / 只读 / 加密密钥）</label>
+          <input class="form-control" id="addf-secret" placeholder="粘贴分享密钥">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">保存路径（服务器端）</label>
+          <input class="form-control" id="addf-path" placeholder="如 /sync/我的文件夹">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">名称（可选）</label>
+          <input class="form-control" id="addf-name" placeholder="留空则自动命名">
+        </div>
+        <div id="addf-msg" class="small"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="addf-submit">添加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ctx-menu" class="ctx-menu d-none"></div>
+{% endblock %}
+{% block scripts %}
+<script>window.PAGE = 'dashboard';</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>startPolling('/api/status');</script>
+{% endblock %}
